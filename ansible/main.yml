@@ -28,7 +28,7 @@
         name: nginx
         state: present
 
-    - name: Flask için gerekli modüller yükleniyor
+    - name: Flask için gerekli modüller yüklenmesi
       pip:
         name: flask
 
