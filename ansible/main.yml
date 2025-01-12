@@ -1,0 +1,55 @@
+---
+- name: Vagrant Sanal Makine Yapılandırması
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Paketlerin güncellenmesi
+      apt:
+        update_cache: yes
+
+    - name: Python yükleniyor
+      apt:
+        name: python3
+        state: present
+
+    - name: Pip yükleniyor
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Docker yükleniyor
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Nginx yükleniyor
+      apt:
+        name: nginx
+        state: present
+
+    - name: Flask için gerekli modüller yükleniyor
+      pip:
+        name: flask
+
+    - name: Flask uygulaması deploy ediliyor
+      copy:
+        src: app.py
+        dest: /home/vagrant/app.py
+
+    - name: Flask uygulaması çalıştırılıyor
+      shell: python3 /home/vagrant/app.py &
+      async: 10
+      poll: 0
+
+    - name: Nginx ayarları düzenleniyor
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/sites-available/default
+      notify: Restart nginx
+
+  handlers:
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
